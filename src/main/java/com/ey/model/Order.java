@@ -1,42 +1,32 @@
 package com.ey.model;
-
 import java.time.LocalDateTime;
-
 import com.ey.enums.OrderStatus;
 import com.ey.enums.PaymentMethod;
 import com.ey.enums.PaymentStatus;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 @Entity
+@Table(name = "orders")
 public class Order {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long orderId;
-   
    private Long customerId;
    private Long restaurantId;
    private Long addressId;
-   @Enumerated(EnumType.STRING)
    private PaymentMethod paymentMethod;
-   
-   @Enumerated(EnumType.STRING)
    private PaymentStatus paymentStatus;
-   
-   @Enumerated(EnumType.STRING)
    private OrderStatus status;
-   
    private String deliveryPartner;
-   private int totalAmount;
+   private Integer totalAmount;
    private LocalDateTime scheduledDeliveryTime;
-   
-   public Order() {
-       super();
-   }
+   private LocalDateTime createdAt;
+   private LocalDateTime updatedAt;
+   private boolean isDeleted;
    
    public Long getOrderId() {
        return orderId;
@@ -86,10 +76,10 @@ public class Order {
    public void setDeliveryPartner(String deliveryPartner) {
        this.deliveryPartner = deliveryPartner;
    }
-   public int getTotalAmount() {
+   public Integer getTotalAmount() {
        return totalAmount;
    }
-   public void setTotalAmount(int totalAmount) {
+   public void setTotalAmount(Integer totalAmount) {
        this.totalAmount = totalAmount;
    }
    public LocalDateTime getScheduledDeliveryTime() {
@@ -98,11 +88,22 @@ public class Order {
    public void setScheduledDeliveryTime(LocalDateTime scheduledDeliveryTime) {
        this.scheduledDeliveryTime = scheduledDeliveryTime;
    }
-   @Override
-   public String toString() {
-       return "Order [orderId=" + orderId + ", customerId=" + customerId + ", restaurantId=" + restaurantId
-               + ", addressId=" + addressId + ", paymentMethod=" + paymentMethod + ", paymentStatus=" + paymentStatus
-               + ", status=" + status + ", deliveryPartner=" + deliveryPartner + ", totalAmount=" + totalAmount
-               + ", scheduledDeliveryTime=" + scheduledDeliveryTime + "]";
+   public LocalDateTime getCreatedAt() {
+       return createdAt;
+   }
+   public void setCreatedAt(LocalDateTime createdAt) {
+       this.createdAt = createdAt;
+   }
+   public LocalDateTime getUpdatedAt() {
+       return updatedAt;
+   }
+   public void setUpdatedAt(LocalDateTime updatedAt) {
+       this.updatedAt = updatedAt;
+   }
+   public boolean isDeleted() {
+       return isDeleted;
+   }
+   public void setDeleted(boolean isDeleted) {
+       this.isDeleted = isDeleted;
    }
 }

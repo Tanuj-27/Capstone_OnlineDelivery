@@ -1,4 +1,5 @@
 package com.ey.controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ey.dto.request.RestaurantCreateRequest;
@@ -9,57 +10,49 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api")
 public class RestaurantController {
-   private final RestaurantService restaurantService;
-   public RestaurantController(RestaurantService restaurantService) {
-       this.restaurantService = restaurantService;
-   }
+  
+	@Autowired
+   private RestaurantService restaurantService;
    
-   // CREATE restaurant (OWNER)
-   @PostMapping("/restaurants")
+	@PostMapping("/restaurants")
    public ResponseEntity<?> createRestaurant(
            @Valid @RequestBody RestaurantCreateRequest request) {
        return restaurantService.createRestaurant(request);
    }
+	
+   @PutMapping("/restaurants/{restaurantId}")
+   public ResponseEntity<?> updateRestaurant(
+           @PathVariable Long restaurantId,
+           @Valid @RequestBody RestaurantUpdateRequest request) {
+       return restaurantService.updateRestaurant(restaurantId, request);
+   }
    
-   // GET ALL restaurants
+   @DeleteMapping("/restaurants/{restaurantId}")
+   public ResponseEntity<?> deleteRestaurant(
+           @PathVariable Long restaurantId) {
+       return restaurantService.deleteRestaurant(restaurantId);
+   }
+   
+   @GetMapping("/restaurants/{restaurantId}")
+   public ResponseEntity<?> getRestaurantById(
+           @PathVariable Long restaurantId) {
+       return restaurantService.getRestaurantById(restaurantId);
+   }
+   
    @GetMapping("/restaurants/all")
    public ResponseEntity<?> getAllRestaurants() {
        return restaurantService.getAllRestaurants();
    }
    
-   // GET restaurants by city OR owner
-   @GetMapping("/restaurants")
-   public ResponseEntity<?> getRestaurants(
-           @RequestParam(required = false) String city,
-           @RequestParam(required = false) Long ownerId) {
-       if (city != null) {
-           return restaurantService.getRestaurantsByCity(city);
-       }
-       if (ownerId != null) {
-           return restaurantService.getRestaurantsByOwner(ownerId);
-       }
-       return ResponseEntity
-               .badRequest()
-               .body(java.util.Map.of("error", "Invalid/missing city or ownerId"));
+   @GetMapping("/restaurants/city/{city}")
+   public ResponseEntity<?> getRestaurantsByCity(
+           @PathVariable String city) {
+       return restaurantService.getRestaurantsByCity(city);
    }
    
-   // GET restaurant by ID
-   @GetMapping("/restaurants/{id}")
-   public ResponseEntity<?> getRestaurantById(@PathVariable Long id) {
-       return restaurantService.getRestaurantById(id);
-   }
-   
-   // UPDATE restaurant (OWNER)
-   @PutMapping("/restaurants/{id}")
-   public ResponseEntity<?> updateRestaurant(
-           @PathVariable Long id,
-           @Valid @RequestBody RestaurantUpdateRequest request) {
-       return restaurantService.updateRestaurant(id, request);
-   }
-   
-   // DELETE restaurant (SOFT DELETE)
-   @DeleteMapping("/restaurants/{id}")
-   public ResponseEntity<?> deleteRestaurant(@PathVariable Long id) {
-       return restaurantService.deleteRestaurant(id);
+   @GetMapping("/restaurants/owner/{ownerId}")
+   public ResponseEntity<?> getRestaurantsByOwner(
+           @PathVariable Long ownerId) {
+       return restaurantService.getRestaurantsByOwner(ownerId);
    }
 }

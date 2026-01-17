@@ -1,28 +1,34 @@
 package com.ey.dto.request;
 import java.time.LocalDateTime;
-import com.ey.enums.PaymentMethod;
 import jakarta.validation.constraints.NotNull;
 
 public class OrderCreateRequest {
-	
-   @NotNull(message = "Address id cannot be null")
+   @NotNull(message = "CustomerId is required")
+   private Long customerId;
+  
+   @NotNull(message = "AddressId is required")
    private Long addressId;
-   
+  
    @NotNull(message = "Payment method is required")
-   private PaymentMethod paymentMethod;
-   
+   private String paymentMethod;
    private LocalDateTime scheduledDeliveryTime;
-   
+  
+   public Long getCustomerId() {
+       return customerId;
+   }
+   public void setCustomerId(Long customerId) {
+       this.customerId = customerId;
+   }
    public Long getAddressId() {
        return addressId;
    }
    public void setAddressId(Long addressId) {
        this.addressId = addressId;
    }
-   public PaymentMethod getPaymentMethod() {
+   public String getPaymentMethod() {
        return paymentMethod;
    }
-   public void setPaymentMethod(PaymentMethod paymentMethod) {
+   public void setPaymentMethod(String paymentMethod) {
        this.paymentMethod = paymentMethod;
    }
    public LocalDateTime getScheduledDeliveryTime() {

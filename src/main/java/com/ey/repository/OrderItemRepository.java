@@ -6,5 +6,6 @@ import com.ey.model.OrderItem;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
-   List<OrderItem> findByOrderId(Long orderId);
+   
+	List<OrderItem> findByOrderId(Long orderId);
 }

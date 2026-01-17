@@ -16,4 +16,6 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
    
    List<MenuItem> findByRestaurantIdAndPriceBetweenAndIsDeletedFalse(
            Long restaurantId, Integer min, Integer max);
+   
+   Optional<MenuItem> findByMenuItemIdAndIsDeletedFalse(Long menuItemId);
 }

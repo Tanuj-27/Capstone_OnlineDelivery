@@ -56,18 +56,18 @@ public class MenuController {
        return menuService.deleteMenuItem(restaurantId, itemId);
    }
    
-   @GetMapping("/restaurants/{restaurantId}/menu/search")
+   @GetMapping("/restaurants/{restaurantId}/menu/search/{keyword}")
    public ResponseEntity<?> searchMenu(
-           @PathVariable Long restaurantId,
-           @RequestParam("q") String q) {
-       return menuService.searchMenu(restaurantId, q);
+          @PathVariable Long restaurantId,
+          @PathVariable String keyword) {
+      return menuService.searchMenu(restaurantId, keyword);
    }
    
-   @GetMapping("/restaurants/{restaurantId}/menu/price-range")
+   @GetMapping("/restaurants/{restaurantId}/menu/price-range/{min}/{max}")
    public ResponseEntity<?> filterByPriceRange(
-           @PathVariable Long restaurantId,
-           @RequestParam Integer min,
-           @RequestParam Integer max) {
-       return menuService.filterByPriceRange(restaurantId, min, max);
+          @PathVariable Long restaurantId,
+          @PathVariable Integer min,
+          @PathVariable Integer max) {
+      return menuService.filterByPriceRange(restaurantId, min, max);
    }
 }

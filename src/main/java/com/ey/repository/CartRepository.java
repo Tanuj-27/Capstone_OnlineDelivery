@@ -6,5 +6,5 @@ import com.ey.model.Cart;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
-   Optional<Cart> findByCustomerIdAndActive(Long customerId, boolean active);
+   Optional<Cart> findByCustomerIdAndActiveTrue(Long customerId);
 }
