@@ -24,8 +24,6 @@ import com.ey.dto.response.OrderResponse;
 
 import com.ey.enums.OrderStatus;
 
-import com.ey.enums.PaymentMethod;
-
 import com.ey.enums.PaymentStatus;
 
 import com.ey.exception.ApiException;
@@ -35,8 +33,6 @@ import com.ey.mapper.OrderMapper;
 import com.ey.model.Cart;
 
 import com.ey.model.CartItem;
-
-import com.ey.model.MenuItem;
 
 import com.ey.model.Order;
 
@@ -55,94 +51,139 @@ import com.ey.repository.OrderItemRepository;
 import com.ey.repository.OrderRepository;
 
 @Service
+
 public class OrderService {
+
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
+
     private OrderRepository orderRepository;
 
     @Autowired
+
     private OrderItemRepository orderItemRepository;
 
     @Autowired
+
     private CartRepository cartRepository;
 
     @Autowired
+
     private CartItemRepository cartItemRepository;
 
     @Autowired
+
     private AddressRepository addressRepository;
 
     @Autowired
+
     private MenuItemRepository menuItemRepository;
 
     public ResponseEntity<?> createOrder(OrderCreateRequest request) {
-        logger.info("Creating order for customerId {}", request.getCustomerId());
 
-        Cart cart = cartRepository.findByCustomerIdAndActiveTrue(request.getCustomerId())
+        Cart cart = cartRepository
+
+                .findByCustomerIdAndActiveTrueAndIsDeletedFalse(request.getCustomerId())
+
                 .orElseThrow(() -> new ApiException("Cart is empty"));
 
-        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getCartId());
+        List<CartItem> cartItems = cartItemRepository.findByCartIdAndIsDeletedFalse(cart.getCartId());
 
         if (cartItems.isEmpty()) {
+
             throw new ApiException("Cart is empty");
+
         }
 
-        addressRepository
-                .findByAddressIdAndCustomerIdAndIsDeletedFalse(
-                        request.getAddressId(), request.getCustomerId())
-                .orElseThrow(() -> new ApiException("Invalid address"));
+        boolean addressExists = addressRepository.findById(request.getAddressId()).isPresent();
 
-        MenuItem firstMenuItem = menuItemRepository
+        if (!addressExists) {
+
+            throw new ApiException("Invalid address");
+
+        }
+
+        Long restaurantId = menuItemRepository
+
                 .findByMenuItemIdAndIsDeletedFalse(cartItems.get(0).getMenuItemId())
-                .orElseThrow(() -> new ApiException("Menu item not found"));
 
-        Long restaurantId = firstMenuItem.getRestaurantId();
+                .orElseThrow(() -> new ApiException("Menu item not found"))
+
+                .getRestaurantId();
 
         Order order = new Order();
+
         order.setCustomerId(request.getCustomerId());
+
         order.setRestaurantId(restaurantId);
+
         order.setAddressId(request.getAddressId());
-        order.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));       
+
+        order.setPaymentMethod(request.getPaymentMethod());
+
+        order.setPaymentStatus(PaymentStatus.SUCCESS);
+
         order.setStatus(OrderStatus.PLACED);
+
+        order.setDeliveryPartner(null);
+
         order.setTotalAmount(cart.getTotalAmount());
+
         order.setScheduledDeliveryTime(request.getScheduledDeliveryTime());
-        order.setCreatedAt(LocalDateTime.now());
-        order.setUpdatedAt(LocalDateTime.now());
+
         order.setDeleted(false);
-        
+
+        order.setCreatedAt(LocalDateTime.now());
+
+        order.setUpdatedAt(LocalDateTime.now());
+
         orderRepository.save(order);
 
         for (CartItem item : cartItems) {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrderId(order.getOrderId());
-            orderItem.setMenuItemId(item.getMenuItemId());
-            orderItem.setQuantity(item.getQuantity());
 
-            orderItemRepository.save(orderItem);
+            OrderItem oi = new OrderItem();
+
+            oi.setOrderId(order.getOrderId());
+
+            oi.setMenuItemId(item.getMenuItemId());
+
+            oi.setQuantity(item.getQuantity());
+
+            oi.setUnitPrice(item.getUnitPrice());
+
+            oi.setDeleted(false);
+
+            oi.setCreatedAt(LocalDateTime.now());
+
+            oi.setUpdatedAt(LocalDateTime.now());
+
+            orderItemRepository.save(oi);
 
         }
 
-        cartItemRepository.deleteAll(cartItems);
-
         cart.setActive(false);
+
         cart.setUpdatedAt(LocalDateTime.now());
 
         cartRepository.save(cart);
 
-        OrderResponse response = OrderMapper.toResponse(order);
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.ok("Order placed successfully");
 
     }
 
     public ResponseEntity<?> getOrders(Long customerId) {
+
         logger.info("Fetching orders for customerId {}", customerId);
 
         List<OrderResponse> responses = orderRepository
+
                 .findByCustomerIdAndIsDeletedFalse(customerId)
+
                 .stream()
+
                 .map(OrderMapper::toResponse)
+
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(responses, HttpStatus.OK);
@@ -150,10 +191,13 @@ public class OrderService {
     }
 
     public ResponseEntity<?> getOrderById(Long customerId, Long orderId) {
+
         logger.info("Fetching order {} for customer {}", orderId, customerId);
 
         Order order = orderRepository
+
                 .findByOrderIdAndCustomerIdAndIsDeletedFalse(orderId, customerId)
+
                 .orElseThrow(() -> new ApiException("Order not found"));
 
         return new ResponseEntity<>(OrderMapper.toResponse(order), HttpStatus.OK);
@@ -161,17 +205,23 @@ public class OrderService {
     }
 
     public ResponseEntity<?> cancelOrder(Long customerId, Long orderId) {
+
         logger.info("Cancelling order {} for customer {}", orderId, customerId);
 
         Order order = orderRepository
+
                 .findByOrderIdAndCustomerIdAndIsDeletedFalse(orderId, customerId)
+
                 .orElseThrow(() -> new ApiException("Order not found"));
 
         if (order.getStatus() != OrderStatus.PLACED) {
+
             throw new ApiException("Order cannot be cancelled");
+
         }
 
         order.setStatus(OrderStatus.CANCELLED);
+
         order.setUpdatedAt(LocalDateTime.now());
 
         orderRepository.save(order);
@@ -181,5 +231,4 @@ public class OrderService {
     }
 
 }
-
  

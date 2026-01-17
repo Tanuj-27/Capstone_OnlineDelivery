@@ -1,17 +1,22 @@
 package com.ey.dto.response;
-
 public class CartItemResponse {
    private Long cartItemId;
+   private Long menuItemId;
    private String itemName;
-   private Integer quantity;
-   private Integer unitPrice;
-   private Integer totalPrice;
-   
+   private int quantity;
+   private int unitPrice;
+   private int totalPrice;
    public Long getCartItemId() {
        return cartItemId;
    }
    public void setCartItemId(Long cartItemId) {
        this.cartItemId = cartItemId;
+   }
+   public Long getMenuItemId() {
+       return menuItemId;
+   }
+   public void setMenuItemId(Long menuItemId) {
+       this.menuItemId = menuItemId;
    }
    public String getItemName() {
        return itemName;
@@ -19,22 +24,22 @@ public class CartItemResponse {
    public void setItemName(String itemName) {
        this.itemName = itemName;
    }
-   public Integer getQuantity() {
+   public int getQuantity() {
        return quantity;
    }
-   public void setQuantity(Integer quantity) {
+   public void setQuantity(int quantity) {
        this.quantity = quantity;
    }
-   public Integer getUnitPrice() {
+   public int getUnitPrice() {
        return unitPrice;
    }
-   public void setUnitPrice(Integer unitPrice) {
+   public void setUnitPrice(int unitPrice) {
        this.unitPrice = unitPrice;
    }
-   public Integer getTotalPrice() {
+   public int getTotalPrice() {
        return totalPrice;
    }
-   public void setTotalPrice(Integer totalPrice) {
+   public void setTotalPrice(int totalPrice) {
        this.totalPrice = totalPrice;
    }
 }

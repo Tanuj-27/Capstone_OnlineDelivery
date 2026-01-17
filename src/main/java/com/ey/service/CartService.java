@@ -1,20 +1,13 @@
 package com.ey.service;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.ey.dto.request.CartItemAddRequest;
+import com.ey.dto.request.CartItemCreateRequest;
 import com.ey.dto.request.CartItemUpdateRequest;
 import com.ey.dto.response.CartItemResponse;
 import com.ey.dto.response.CartResponse;
 import com.ey.exception.ApiException;
-import com.ey.mapper.CartMapper;
 import com.ey.model.Cart;
 import com.ey.model.CartItem;
 import com.ey.model.MenuItem;
@@ -24,133 +17,183 @@ import com.ey.repository.MenuItemRepository;
 
 @Service
 public class CartService {
-   private static final Logger logger = LoggerFactory.getLogger(CartService.class);
-   
-   @Autowired
-   private CartRepository cartRepository;
-   
-   @Autowired
-   private CartItemRepository cartItemRepository;
-  
-   @Autowired
-   private MenuItemRepository menuItemRepository;
-   
-   public ResponseEntity<?> getCart(Long customerId) {
-       logger.info("Get cart for customerId {}", customerId);
-       
-       Cart cart = cartRepository.findByCustomerIdAndActiveTrue(customerId)
-               .orElseThrow(() -> new ApiException("Active cart not found"));
-       
-       List<CartItem> items = cartItemRepository.findByCartId(cart.getCartId());
-       List<CartItemResponse> itemResponses = items.stream().map(item -> {
-           MenuItem menuItem = menuItemRepository.findByMenuItemIdAndIsDeletedFalse(item.getMenuItemId())
-                   .orElseThrow(() -> new ApiException("Menu item not found"));
-           return CartMapper.toItemResponse(item, menuItem.getName());
-       }).toList();
-       
-       CartResponse response = CartMapper.toCartResponse(cart, cart.getTotalAmount(), itemResponses);
-       return new ResponseEntity<>(response, HttpStatus.OK);
+   private final CartRepository cartRepository;
+   private final CartItemRepository cartItemRepository;
+   private final MenuItemRepository menuItemRepository;
+   public CartService(CartRepository cartRepository,
+                      CartItemRepository cartItemRepository,
+                      MenuItemRepository menuItemRepository) {
+       this.cartRepository = cartRepository;
+       this.cartItemRepository = cartItemRepository;
+       this.menuItemRepository = menuItemRepository;
    }
    
-   public ResponseEntity<?> addItem(CartItemAddRequest request) {
-       logger.info("Add item to cart. customerId {}, menuItemId {}",
-               request.getCustomerId(), request.getMenuItemId());       
-       Cart cart = cartRepository.findByCustomerIdAndActiveTrue(request.getCustomerId())
+   public ResponseEntity<?> addItemToCart(CartItemCreateRequest request) {
+       Cart cart = cartRepository
+               .findByCustomerIdAndActiveTrueAndIsDeletedFalse(request.getCustomerId())
                .orElseGet(() -> {
-                   Cart newCart = new Cart();
-                   newCart.setCustomerId(request.getCustomerId());
-                   newCart.setActive(true);
-                   newCart.setTotalAmount(0);
-                   newCart.setCreatedAt(LocalDateTime.now());
-                   newCart.setUpdatedAt(LocalDateTime.now());
-                   return cartRepository.save(newCart);
+                   Cart c = new Cart();
+                   c.setCustomerId(request.getCustomerId());
+                   c.setActive(true);
+                   c.setTotalAmount(0);
+                   c.setDeleted(false);
+                   c.setCreatedAt(LocalDateTime.now());
+                   c.setUpdatedAt(LocalDateTime.now());
+                   return cartRepository.save(c);
                });
-       
-       MenuItem menuItem = menuItemRepository.findByMenuItemIdAndIsDeletedFalse(request.getMenuItemId())
+       MenuItem menuItem = menuItemRepository
+               .findByMenuItemIdAndIsDeletedFalse(request.getMenuItemId())
                .orElseThrow(() -> new ApiException("Menu item not found"));
-       
-       CartItem item = new CartItem();
-       item.setCartId(cart.getCartId());
-       item.setMenuItemId(menuItem.getMenuItemId());
-       item.setQuantity(request.getQuantity());
-       item.setUnitPrice(menuItem.getPrice());
-       item.setCreatedAt(LocalDateTime.now());
-       item.setUpdatedAt(LocalDateTime.now());
-       cartItemRepository.save(item);
-       
-       int total = cart.getTotalAmount() + (item.getQuantity() * item.getUnitPrice());
+       CartItem cartItem = new CartItem();
+       cartItem.setCartId(cart.getCartId());
+       cartItem.setMenuItemId(menuItem.getMenuItemId());
+       cartItem.setQuantity(request.getQuantity());
+       cartItem.setUnitPrice(menuItem.getPrice());
+       cartItem.setDeleted(false);
+       cartItem.setCreatedAt(LocalDateTime.now());
+       cartItem.setUpdatedAt(LocalDateTime.now());
+       cartItemRepository.save(cartItem);
+       int total = cartItemRepository
+               .findByCartIdAndIsDeletedFalse(cart.getCartId())
+               .stream()
+               .mapToInt(i -> i.getQuantity() * i.getUnitPrice())
+               .sum();
        cart.setTotalAmount(total);
        cart.setUpdatedAt(LocalDateTime.now());
        cartRepository.save(cart);
-       
-       Map<String, Object> response = new HashMap<>();
-       response.put("cartId", cart.getCartId());
-       response.put("message", "Item added");
-       response.put("totalAmount", cart.getTotalAmount());
-       return new ResponseEntity<>(response, HttpStatus.OK);
+       return ResponseEntity.ok("Item added to cart");
    }
    
-   public ResponseEntity<?> updateItem(CartItemUpdateRequest request) {
-       logger.info("Update cart item {} for customer {}",
-               request.getCartItemId(), request.getCustomerId());
-       
-       Cart cart = cartRepository.findByCustomerIdAndActiveTrue(request.getCustomerId())
-               .orElseThrow(() -> new ApiException("Active cart not found"));
-       CartItem item = cartItemRepository.findByCartItemIdAndCartId(request.getCartItemId(), cart.getCartId())
-               .orElseThrow(() -> new ApiException("Cart item not found"));
-       
-       int oldTotal = item.getQuantity() * item.getUnitPrice();
-       item.setQuantity(request.getQuantity());
-       item.setUpdatedAt(LocalDateTime.now());
-       cartItemRepository.save(item);
-       
-       int newTotal = request.getQuantity() * item.getUnitPrice();
-       cart.setTotalAmount(cart.getTotalAmount() - oldTotal + newTotal);
-       cart.setUpdatedAt(LocalDateTime.now());
-       cartRepository.save(cart);
-       
-       Map<String, Object> response = new HashMap<>();
-       response.put("cartId", cart.getCartId());
-       response.put("message", "Item updated");
-       response.put("totalAmount", cart.getTotalAmount());
-       
-       return new ResponseEntity<>(response, HttpStatus.OK);
+   public ResponseEntity<?> getCart(Long customerId) {
+       Cart cart = cartRepository
+               .findByCustomerIdAndActiveTrueAndIsDeletedFalse(customerId)
+               .orElseThrow(() -> new ApiException("No active cart found"));
+       List<CartItem> items =
+               cartItemRepository.findByCartIdAndIsDeletedFalse(cart.getCartId());
+       CartResponse response = new CartResponse();
+       response.setCartId(cart.getCartId());
+       response.setCustomerId(cart.getCustomerId());
+       response.setActive(cart.isActive());
+       response.setTotalAmount(cart.getTotalAmount());
+       List<CartItemResponse> itemResponses = items.stream().map(i -> {
+           CartItemResponse r = new CartItemResponse();
+           r.setCartItemId(i.getCartItemId());
+           r.setMenuItemId(i.getMenuItemId());
+           r.setQuantity(i.getQuantity());
+           r.setUnitPrice(i.getUnitPrice());
+           r.setTotalPrice(i.getQuantity() * i.getUnitPrice());
+           String name = menuItemRepository
+                   .findByMenuItemIdAndIsDeletedFalse(i.getMenuItemId())
+                   .map(MenuItem::getName)
+                   .orElse("Unknown Item");
+           r.setItemName(name);
+           return r;
+       }).toList();
+       response.setItems(itemResponses);
+       return ResponseEntity.ok(response);
    }
    
-   public ResponseEntity<?> removeItem(Long customerId, Long cartItemId) {
-       logger.info("Remove cart item {} for customer {}", cartItemId, customerId);
-       Cart cart = cartRepository.findByCustomerIdAndActiveTrue(customerId)
-               .orElseThrow(() -> new ApiException("Active cart not found"));
-       CartItem item = cartItemRepository.findByCartItemIdAndCartId(cartItemId, cart.getCartId())
-               .orElseThrow(() -> new ApiException("Cart item not found"));
-       
-       int itemTotal = item.getQuantity() * item.getUnitPrice();
-       cartItemRepository.delete(item);
-       cart.setTotalAmount(cart.getTotalAmount() - itemTotal);
-       cart.setUpdatedAt(LocalDateTime.now());
-       cartRepository.save(cart);
-       
-       Map<String, Object> response = new HashMap<>();
-       response.put("cartId", cart.getCartId());
-       response.put("message", "Item removed");
-       response.put("totalAmount", cart.getTotalAmount());
-       
-       return new ResponseEntity<>(response, HttpStatus.OK);
-   }
-   
+   public ResponseEntity<?> updateCartItem(CartItemUpdateRequest request) {
+
+	    Cart cart = cartRepository
+
+	            .findByCustomerIdAndActiveTrueAndIsDeletedFalse(request.getCustomerId())
+
+	            .orElseThrow(() -> new ApiException("No active cart found"));
+
+	    CartItem cartItem = cartItemRepository.findById(request.getCartItemId())
+
+	            .orElseThrow(() -> new ApiException("Cart item not found"));
+
+	    if (!cartItem.getCartId().equals(cart.getCartId())) {
+
+	        throw new ApiException("Cart item does not belong to this cart");
+
+	    }
+
+	    cartItem.setQuantity(request.getQuantity());
+
+	    cartItem.setUpdatedAt(LocalDateTime.now());
+
+	    cartItemRepository.save(cartItem);
+
+	    int total = cartItemRepository
+
+	            .findByCartIdAndIsDeletedFalse(cart.getCartId())
+
+	            .stream()
+
+	            .mapToInt(i -> i.getQuantity() * i.getUnitPrice())
+
+	            .sum();
+
+	    cart.setTotalAmount(total);
+
+	    cart.setUpdatedAt(LocalDateTime.now());
+
+	    cartRepository.save(cart);
+
+	    return ResponseEntity.ok("Cart item updated");
+
+	}
+	 
+   public ResponseEntity<?> deleteCartItem(Long customerId, Long cartItemId) {
+
+	    Cart cart = cartRepository
+
+	            .findByCustomerIdAndActiveTrueAndIsDeletedFalse(customerId)
+
+	            .orElseThrow(() -> new ApiException("No active cart found"));
+
+	    CartItem cartItem = cartItemRepository.findById(cartItemId)
+
+	            .orElseThrow(() -> new ApiException("Cart item not found"));
+
+	    if (!cartItem.getCartId().equals(cart.getCartId())) {
+
+	        throw new ApiException("Cart item does not belong to this cart");
+
+	    }
+
+	    cartItem.setDeleted(true);
+
+	    cartItem.setUpdatedAt(LocalDateTime.now());
+
+	    cartItemRepository.save(cartItem);
+
+	    int total = cartItemRepository
+
+	            .findByCartIdAndIsDeletedFalse(cart.getCartId())
+
+	            .stream()
+
+	            .mapToInt(i -> i.getQuantity() * i.getUnitPrice())
+
+	            .sum();
+
+	    cart.setTotalAmount(total);
+
+	    cart.setUpdatedAt(LocalDateTime.now());
+
+	    cartRepository.save(cart);
+
+	    return ResponseEntity.ok("Cart item deleted");
+
+	}
+	 
    public ResponseEntity<?> clearCart(Long customerId) {
-       logger.info("Clear cart for customer {}", customerId);
-       Cart cart = cartRepository.findByCustomerIdAndActiveTrue(customerId)
-               .orElseThrow(() -> new ApiException("Active cart not found"));
-       
-       List<CartItem> items = cartItemRepository.findByCartId(cart.getCartId());
-       cartItemRepository.deleteAll(items);
-       cart.setTotalAmount(0);
-       cart.setUpdatedAt(LocalDateTime.now());
-       cartRepository.save(cart);
-       
-       Map<String, Object> response = new HashMap<>();
-       response.put("message", "Cart cleared");
-       return new ResponseEntity<>(response, HttpStatus.OK);
-   }
+	   Cart cart = cartRepository
+	           .findByCustomerIdAndActiveTrueAndIsDeletedFalse(customerId)
+	           .orElseThrow(() -> new ApiException("No active cart found"));
+	   List<CartItem> items = cartItemRepository.findByCartIdAndIsDeletedFalse(cart.getCartId());
+	   items.forEach(i -> {
+	       i.setDeleted(true);
+	       i.setUpdatedAt(LocalDateTime.now());
+	   });
+	   cartItemRepository.saveAll(items);
+	   cart.setTotalAmount(0);
+	   cart.setUpdatedAt(LocalDateTime.now());
+	   cartRepository.save(cart);
+	   return ResponseEntity.ok("Cart cleared");
+	}
 }

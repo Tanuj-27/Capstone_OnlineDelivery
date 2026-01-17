@@ -20,6 +20,7 @@ public class Cart {
     private Long customerId;
     private boolean active;
     private int totalAmount;
+    private boolean isDeleted;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -74,16 +75,24 @@ public class Cart {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+    
 
-    @Override
+    public boolean isDeleted() {
+		return isDeleted;
+	}
 
-    public String toString() {
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
 
-        return "Cart [cartId=" + cartId + ", customerId=" + customerId + ", active=" + active + ", totalAmount="
+	@Override
+	public String toString() {
+		return "Cart [cartId=" + cartId + ", customerId=" + customerId + ", active=" + active + ", totalAmount="
+				+ totalAmount + ", isDeleted=" + isDeleted + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt
+				+ "]";
+	}
 
-                + totalAmount + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
-
-    }
+	
 
 }
  

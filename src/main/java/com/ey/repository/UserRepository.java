@@ -7,4 +7,5 @@ import com.ey.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
    Optional<User> findByEmail(String email);
+   Optional<User> findByEmailAndPasswordAndIsDeletedFalse(String email, String password);
 }

@@ -26,6 +26,7 @@ public class User {
     private String phone;
     private String email;
     private String password;
+    private boolean isDeleted;
     
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -101,15 +102,22 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    @Override
+	public boolean isDeleted() {
+		return isDeleted;
+	}
 
-    public String toString() {
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
 
-        return "User [userId=" + userId + ", name=" + name + ", phone=" + phone + ", email=" + email + ", role=" + role
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", name=" + name + ", phone=" + phone + ", email=" + email + ", password="
+				+ password + ", isDeleted=" + isDeleted + ", role=" + role + ", createdAt=" + createdAt + ", updatedAt="
+				+ updatedAt + "]";
+	}
 
-                + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
-
-    }
+   
 
 }
  

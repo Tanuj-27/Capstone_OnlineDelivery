@@ -4,18 +4,15 @@ import jakarta.validation.constraints.Min;
 
 import jakarta.validation.constraints.NotNull;
 
-public class CartItemUpdateRequest {
+public class CartItemCreateRequest {
 
     @NotNull(message = "CustomerId is required")
-
     private Long customerId;
 
-    @NotNull(message = "CartItemId is required")
-
-    private Long cartItemId;
+    @NotNull(message = "MenuItemId is required")
+    private Long menuItemId;
 
     @Min(value = 1, message = "Quantity must be at least 1")
-
     private int quantity;
 
     public Long getCustomerId() {
@@ -30,15 +27,15 @@ public class CartItemUpdateRequest {
 
     }
 
-    public Long getCartItemId() {
+    public Long getMenuItemId() {
 
-        return cartItemId;
+        return menuItemId;
 
     }
 
-    public void setCartItemId(Long cartItemId) {
+    public void setMenuItemId(Long menuItemId) {
 
-        this.cartItemId = cartItemId;
+        this.menuItemId = menuItemId;
 
     }
 
