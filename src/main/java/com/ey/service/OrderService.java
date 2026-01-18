@@ -51,33 +51,26 @@ import com.ey.repository.OrderItemRepository;
 import com.ey.repository.OrderRepository;
 
 @Service
-
 public class OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
-
     private OrderRepository orderRepository;
 
     @Autowired
-
     private OrderItemRepository orderItemRepository;
 
     @Autowired
-
     private CartRepository cartRepository;
 
     @Autowired
-
     private CartItemRepository cartItemRepository;
 
     @Autowired
-
     private AddressRepository addressRepository;
 
     @Autowired
-
     private MenuItemRepository menuItemRepository;
 
     public ResponseEntity<?> createOrder(OrderCreateRequest request) {

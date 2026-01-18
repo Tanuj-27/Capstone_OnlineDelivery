@@ -8,7 +8,5 @@ import com.ey.model.Address;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
    List<Address> findByCustomerIdAndIsDeletedFalse(Long customerId);
-   Optional<Address> findByAddressIdAndCustomerIdAndIsDeletedFalse(
-           Long addressId, Long customerId);
-   Optional<Address> findByCustomerIdAndIsDefaultTrueAndIsDeletedFalse(Long customerId);
+   Optional<Address> findByAddressIdAndIsDeletedFalse(Long addressId);
 }
