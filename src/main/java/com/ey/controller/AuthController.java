@@ -41,4 +41,9 @@ public class AuthController {
       return authService.resetPassword(request);
    }
    
+   @PostMapping("/logout")
+   public ResponseEntity<?> logout(){
+	   return authService.logout();
+   }
+   
 }

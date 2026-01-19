@@ -213,6 +213,10 @@ public class AuthService {
         return ResponseEntity.ok(Map.of("message", "Password reset successful"));
 
     }
+    
+    public ResponseEntity<?> logout(){
+    	return ResponseEntity.ok("logged Out Successfully");
+    }
 
 }
  
