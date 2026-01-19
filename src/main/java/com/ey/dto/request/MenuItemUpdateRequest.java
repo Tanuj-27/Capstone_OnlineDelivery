@@ -11,6 +11,7 @@ public class MenuItemUpdateRequest {
    @NotNull(message = "Price is required")
    @Min(value = 1, message = "Price must be greater than 0")
    private Integer price;
+   
    public String getName() {
        return name;
    }

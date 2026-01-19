@@ -33,6 +33,8 @@ public class User {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String resetToken;
+    private LocalDateTime resetTokenExpiry;
 
     public User() {
         super();
@@ -108,16 +110,32 @@ public class User {
 
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
+	}	
+	
+	public String getResetToken() {
+		return resetToken;
+	}
+
+	public void setResetToken(String resetToken) {
+		this.resetToken = resetToken;
+	}
+
+	public LocalDateTime getResetTokenExpiry() {
+		return resetTokenExpiry;
+	}
+
+	public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+		this.resetTokenExpiry = resetTokenExpiry;
 	}
 
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", name=" + name + ", phone=" + phone + ", email=" + email + ", password="
 				+ password + ", isDeleted=" + isDeleted + ", role=" + role + ", createdAt=" + createdAt + ", updatedAt="
-				+ updatedAt + "]";
+				+ updatedAt + ", resetToken=" + resetToken + ", resetTokenExpiry=" + resetTokenExpiry + "]";
 	}
 
-   
+	 
 
 }
  

@@ -6,53 +6,49 @@ import jakarta.validation.constraints.NotNull;
 
 public class CartItemUpdateRequest {
 
-    @NotNull(message = "CustomerId is required")
+	@NotNull(message = "CustomerId is required")
+	private Long customerId;
 
-    private Long customerId;
+	@NotNull(message = "CartItemId is required")
+	private Long cartItemId;
 
-    @NotNull(message = "CartItemId is required")
+	@Min(value = 1, message = "Quantity must be at least 1")
+	private int quantity;
 
-    private Long cartItemId;
+	public Long getCustomerId() {
 
-    @Min(value = 1, message = "Quantity must be at least 1")
+		return customerId;
 
-    private int quantity;
+	}
 
-    public Long getCustomerId() {
+	public void setCustomerId(Long customerId) {
 
-        return customerId;
+		this.customerId = customerId;
 
-    }
+	}
 
-    public void setCustomerId(Long customerId) {
+	public Long getCartItemId() {
 
-        this.customerId = customerId;
+		return cartItemId;
 
-    }
+	}
 
-    public Long getCartItemId() {
+	public void setCartItemId(Long cartItemId) {
 
-        return cartItemId;
+		this.cartItemId = cartItemId;
 
-    }
+	}
 
-    public void setCartItemId(Long cartItemId) {
+	public int getQuantity() {
 
-        this.cartItemId = cartItemId;
+		return quantity;
 
-    }
+	}
 
-    public int getQuantity() {
+	public void setQuantity(int quantity) {
 
-        return quantity;
+		this.quantity = quantity;
 
-    }
-
-    public void setQuantity(int quantity) {
-
-        this.quantity = quantity;
-
-    }
+	}
 
 }
- 

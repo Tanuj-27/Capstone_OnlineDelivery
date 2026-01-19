@@ -6,65 +6,64 @@ import jakarta.validation.constraints.NotNull;
 
 public class RestaurantUpdateRequest {
 
-    @NotNull(message = "OwnerId is required")
-    private Long ownerId;
+	@NotNull(message = "OwnerId is required")
+	private Long ownerId;
 
-    @NotBlank(message = "Restaurant name is required")
-    private String name;
+	@NotBlank(message = "Restaurant name is required")
+	private String name;
 
-    @NotBlank(message = "Address is required")
-    private String address;
+	@NotBlank(message = "Address is required")
+	private String address;
 
-    @NotBlank(message = "City is required")
-    private String city;
+	@NotBlank(message = "City is required")
+	private String city;
 
-    public Long getOwnerId() {
+	public Long getOwnerId() {
 
-        return ownerId;
+		return ownerId;
 
-    }
+	}
 
-    public void setOwnerId(Long ownerId) {
+	public void setOwnerId(Long ownerId) {
 
-        this.ownerId = ownerId;
+		this.ownerId = ownerId;
 
-    }
+	}
 
-    public String getName() {
+	public String getName() {
 
-        return name;
+		return name;
 
-    }
+	}
 
-    public void setName(String name) {
+	public void setName(String name) {
 
-        this.name = name;
+		this.name = name;
 
-    }
+	}
 
-    public String getAddress() {
+	public String getAddress() {
 
-        return address;
+		return address;
 
-    }
+	}
 
-    public void setAddress(String address) {
+	public void setAddress(String address) {
 
-        this.address = address;
+		this.address = address;
 
-    }
+	}
 
-    public String getCity() {
+	public String getCity() {
 
-        return city;
+		return city;
 
-    }
+	}
 
-    public void setCity(String city) {
+	public void setCity(String city) {
 
-        this.city = city;
+		this.city = city;
 
-    }
+	}
 
 }
- 

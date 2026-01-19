@@ -21,96 +21,53 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-
 public class SecurityConfig {
 
-    private final JwtAuthorizationFilter jwtAuthorizationFilter;
+	private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
-    private final JwtUtil jwtUtil;
+	public SecurityConfig(JwtAuthorizationFilter jwtAuthorizationFilter) {
 
-    private final com.ey.repository.UserRepository userRepository;
+		this.jwtAuthorizationFilter = jwtAuthorizationFilter;
 
-    public SecurityConfig(
+	}
 
-            JwtAuthorizationFilter jwtAuthorizationFilter,
+	@Bean
+	public PasswordEncoder passwordEncoder() {
 
-            JwtUtil jwtUtil,
+		return new BCryptPasswordEncoder();
 
-            com.ey.repository.UserRepository userRepository
+	}
 
-    ) {
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 
-        this.jwtAuthorizationFilter = jwtAuthorizationFilter;
+		return config.getAuthenticationManager();
 
-        this.jwtUtil = jwtUtil;
+	}
 
-        this.userRepository = userRepository;
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    }
+		http.csrf(csrf -> csrf.disable());
 
-    @Bean
+		http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-    public PasswordEncoder passwordEncoder() {
+		http.authorizeHttpRequests(auth -> auth
 
-        return new BCryptPasswordEncoder();
+				.requestMatchers("/api/auth/**").permitAll()
 
-    }
+				.requestMatchers("/api/owner/**").hasAnyRole("OWNER", "ADMIN")
 
-    @Bean
+				.requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+				.anyRequest().authenticated()
 
-        return config.getAuthenticationManager();
+		);
 
-    }
+		http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
-    @Bean
+		return http.build();
 
-    public SecurityFilterChain filterChain(
-
-            HttpSecurity http,
-
-            AuthenticationManager authenticationManager
-
-    ) throws Exception {
-
-        JwtAuthenticationFilter jwtAuthenticationFilter =
-
-                new JwtAuthenticationFilter(authenticationManager, jwtUtil, userRepository);
-
-        http.csrf(csrf -> csrf.disable());
-
-        http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http.authorizeHttpRequests(auth -> auth
-
-                .requestMatchers(
-
-                        "/api/auth/register",
-
-                        "/api/auth/login",
-
-                        "/api/auth/forgot-password",
-
-                        "/api/auth/reset-password"
-
-                ).permitAll()
-
-                .requestMatchers("/api/owner/**").hasAnyRole("OWNER", "ADMIN")
-
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                .anyRequest().authenticated()
-
-        );
-
-        http.addFilter(jwtAuthenticationFilter);
-
-        http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-
-    }
+	}
 
 }
- 

@@ -4,7 +4,8 @@ import com.ey.dto.request.AddressUpdateRequest;
 import com.ey.dto.response.AddressResponse;
 import com.ey.model.Address;
 public class AddressMapper {
-   public static Address toEntity(AddressCreateRequest request) {
+   
+	public static Address toEntity(AddressCreateRequest request) {
        Address address = new Address();
        address.setCustomerId(request.getCustomerId());
        address.setAddress(request.getAddress());
@@ -15,6 +16,7 @@ public class AddressMapper {
        address.setDefault(request.getIsDefault());
        return address;
    }
+	
    public static void updateEntity(Address address, AddressUpdateRequest request) {
        address.setAddress(request.getAddress());
        address.setCity(request.getCity());
@@ -23,6 +25,7 @@ public class AddressMapper {
        address.setPhone(request.getPhone());
        address.setDefault(request.getIsDefault());
    }
+   
    public static AddressResponse toResponse(Address address) {
        AddressResponse response = new AddressResponse();
        response.setAddressId(address.getAddressId());

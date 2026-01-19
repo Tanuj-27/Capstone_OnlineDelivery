@@ -15,54 +15,35 @@ import com.ey.service.CartService;
 import jakarta.validation.Valid;
 
 @RestController
-
 @RequestMapping("/api")
-
 public class CartController {
 
-    @Autowired
+	@Autowired
+	private CartService cartService;
 
-    private CartService cartService;
+	@GetMapping("/cart/{customerId}")
+	public ResponseEntity<?> getCart(@PathVariable Long customerId) {
+		return cartService.getCart(customerId);
+	}
 
-    @GetMapping("/cart/{customerId}")
+	@PostMapping("/cart/items")
+	public ResponseEntity<?> addItemToCart(@Valid @RequestBody CartItemCreateRequest request) {
+		return cartService.addItemToCart(request);
+	}
 
-    public ResponseEntity<?> getCart(@PathVariable Long customerId) {
+	@PutMapping("/cart/items")
+	public ResponseEntity<?> updateCartItem(@Valid @RequestBody CartItemUpdateRequest request) {
+		return cartService.updateCartItem(request);
+	}
 
-        return cartService.getCart(customerId);
+	@DeleteMapping("/cart/{customerId}/items/{cartItemId}")
+	public ResponseEntity<?> deleteCartItem(@PathVariable Long customerId, @PathVariable Long cartItemId) {
+		return cartService.deleteCartItem(customerId, cartItemId);
+	}
 
-    }
-
-    @PostMapping("/cart/items")
-
-    public ResponseEntity<?> addItemToCart(@Valid @RequestBody CartItemCreateRequest request) {
-
-        return cartService.addItemToCart(request);
-
-    }
-
-    @PutMapping("/cart/items")
-
-    public ResponseEntity<?> updateCartItem(@Valid @RequestBody CartItemUpdateRequest request) {
-
-        return cartService.updateCartItem(request);
-
-    }
-
-    @DeleteMapping("/cart/{customerId}/items/{cartItemId}")
-
-    public ResponseEntity<?> deleteCartItem(@PathVariable Long customerId, @PathVariable Long cartItemId) {
-
-        return cartService.deleteCartItem(customerId, cartItemId);
-
-    }
-
-    @DeleteMapping("/cart/{customerId}/clear")
-
-    public ResponseEntity<?> clearCart(@PathVariable Long customerId) {
-
-        return cartService.clearCart(customerId);
-
-    }
+	@DeleteMapping("/cart/{customerId}/clear")
+	public ResponseEntity<?> clearCart(@PathVariable Long customerId) {
+		return cartService.clearCart(customerId);
+	}
 
 }
- 

@@ -1,4 +1,5 @@
 package com.ey.dto.response;
+
 public class CartItemResponse {
    private Long cartItemId;
    private Long menuItemId;

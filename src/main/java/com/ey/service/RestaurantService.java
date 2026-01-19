@@ -15,6 +15,7 @@ import com.ey.exception.ApiException;
 import com.ey.mapper.RestaurantMapper;
 import com.ey.model.Restaurant;
 import com.ey.repository.RestaurantRepository;
+
 @Service
 public class RestaurantService {
    private static final Logger logger = LoggerFactory.getLogger(RestaurantService.class);

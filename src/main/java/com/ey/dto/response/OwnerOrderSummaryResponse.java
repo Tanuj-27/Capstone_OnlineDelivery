@@ -4,47 +4,46 @@ import com.ey.enums.OrderStatus;
 
 public class OwnerOrderSummaryResponse {
 
-    private Long orderId;
+	private Long orderId;
 
-    private OrderStatus status;
+	private OrderStatus status;
 
-    private Integer totalAmount;
+	private Integer totalAmount;
 
-    public Long getOrderId() {
+	public Long getOrderId() {
 
-        return orderId;
+		return orderId;
 
-    }
+	}
 
-    public void setOrderId(Long orderId) {
+	public void setOrderId(Long orderId) {
 
-        this.orderId = orderId;
+		this.orderId = orderId;
 
-    }
+	}
 
-    public OrderStatus getStatus() {
+	public OrderStatus getStatus() {
 
-        return status;
+		return status;
 
-    }
+	}
 
-    public void setStatus(OrderStatus status) {
+	public void setStatus(OrderStatus status) {
 
-        this.status = status;
+		this.status = status;
 
-    }
+	}
 
-    public Integer getTotalAmount() {
+	public Integer getTotalAmount() {
 
-        return totalAmount;
+		return totalAmount;
 
-    }
+	}
 
-    public void setTotalAmount(Integer totalAmount) {
+	public void setTotalAmount(Integer totalAmount) {
 
-        this.totalAmount = totalAmount;
+		this.totalAmount = totalAmount;
 
-    }
+	}
 
 }
- 

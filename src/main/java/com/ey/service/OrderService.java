@@ -76,33 +76,24 @@ public class OrderService {
     public ResponseEntity<?> createOrder(OrderCreateRequest request) {
 
         Cart cart = cartRepository
-
                 .findByCustomerIdAndActiveTrueAndIsDeletedFalse(request.getCustomerId())
-
                 .orElseThrow(() -> new ApiException("Cart is empty"));
 
         List<CartItem> cartItems = cartItemRepository.findByCartIdAndIsDeletedFalse(cart.getCartId());
 
         if (cartItems.isEmpty()) {
-
             throw new ApiException("Cart is empty");
-
         }
 
         boolean addressExists = addressRepository.findById(request.getAddressId()).isPresent();
 
         if (!addressExists) {
-
             throw new ApiException("Invalid address");
-
         }
 
         Long restaurantId = menuItemRepository
-
                 .findByMenuItemIdAndIsDeletedFalse(cartItems.get(0).getMenuItemId())
-
                 .orElseThrow(() -> new ApiException("Menu item not found"))
-
                 .getRestaurantId();
 
         Order order = new Order();

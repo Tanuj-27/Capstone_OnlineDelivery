@@ -2,75 +2,74 @@ package com.ey.dto.response;
 
 public class MenuItemResponse {
 
-    private Long menuItemId;
+	private Long menuItemId;
 
-    private Long restaurantId;
+	private Long restaurantId;
 
-    private String name;
+	private String name;
 
-    private String description;
+	private String description;
 
-    private Integer price;
+	private Integer price;
 
-    public Long getMenuItemId() {
+	public Long getMenuItemId() {
 
-        return menuItemId;
+		return menuItemId;
 
-    }
+	}
 
-    public void setMenuItemId(Long menuItemId) {
+	public void setMenuItemId(Long menuItemId) {
 
-        this.menuItemId = menuItemId;
+		this.menuItemId = menuItemId;
 
-    }
+	}
 
-    public Long getRestaurantId() {
+	public Long getRestaurantId() {
 
-        return restaurantId;
+		return restaurantId;
 
-    }
+	}
 
-    public void setRestaurantId(Long restaurantId) {
+	public void setRestaurantId(Long restaurantId) {
 
-        this.restaurantId = restaurantId;
+		this.restaurantId = restaurantId;
 
-    }
+	}
 
-    public String getName() {
+	public String getName() {
 
-        return name;
+		return name;
 
-    }
+	}
 
-    public void setName(String name) {
+	public void setName(String name) {
 
-        this.name = name;
+		this.name = name;
 
-    }
+	}
 
-    public String getDescription() {
+	public String getDescription() {
 
-        return description;
+		return description;
 
-    }
+	}
 
-    public void setDescription(String description) {
+	public void setDescription(String description) {
 
-        this.description = description;
+		this.description = description;
 
-    }
+	}
 
-    public Integer getPrice() {
+	public Integer getPrice() {
 
-        return price;
+		return price;
 
-    }
+	}
 
-    public void setPrice(Integer price) {
+	public void setPrice(Integer price) {
 
-        this.price = price;
+		this.price = price;
 
-    }
+	}
 
 }
- 

@@ -12,10 +12,12 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "orders")
 public class Order {
-   @Id
+   
+	@Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long orderId;
-   private Long customerId;
+   
+	private Long customerId;
    private Long restaurantId;
    private Long addressId;
    private PaymentMethod paymentMethod;

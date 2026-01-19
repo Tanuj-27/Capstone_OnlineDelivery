@@ -8,12 +8,14 @@ import com.ey.dto.request.AddressUpdateRequest;
 import com.ey.exception.ApiException;
 import com.ey.model.Address;
 import com.ey.repository.AddressRepository;
+
 @Service
 public class AddressService {
    private final AddressRepository addressRepository;
    public AddressService(AddressRepository addressRepository) {
        this.addressRepository = addressRepository;
    }
+   
    public ResponseEntity<?> createAddress(AddressCreateRequest request) {
        Address address = new Address();
        address.setCustomerId(request.getCustomerId());
@@ -29,15 +31,18 @@ public class AddressService {
        addressRepository.save(address);
        return ResponseEntity.ok("Address created");
    }
+   
    public ResponseEntity<?> getAddressesByCustomerId(Long customerId) {
        List<Address> addresses = addressRepository.findByCustomerIdAndIsDeletedFalse(customerId);
        return ResponseEntity.ok(addresses);
    }
+   
    public ResponseEntity<?> getAddressById(Long addressId) {
        Address address = addressRepository.findByAddressIdAndIsDeletedFalse(addressId)
                .orElseThrow(() -> new ApiException("Address not found"));
        return ResponseEntity.ok(address);
    }
+   
    public ResponseEntity<?> updateAddress(AddressUpdateRequest request) {
        Address address = addressRepository.findByAddressIdAndIsDeletedFalse(request.getAddressId())
                .orElseThrow(() -> new ApiException("Address not found"));
@@ -51,6 +56,7 @@ public class AddressService {
        addressRepository.save(address);
        return ResponseEntity.ok("Address updated");
    }
+   
    public ResponseEntity<?> deleteAddress(Long addressId) {
        Address address = addressRepository.findByAddressIdAndIsDeletedFalse(addressId)
                .orElseThrow(() -> new ApiException("Address not found"));
@@ -59,6 +65,7 @@ public class AddressService {
        addressRepository.save(address);
        return ResponseEntity.ok("Address deleted");
    }
+   
    public ResponseEntity<?> setDefaultAddress(Long customerId, Long addressId) {
        List<Address> addresses = addressRepository.findByCustomerIdAndIsDeletedFalse(customerId);
        if (addresses.isEmpty()) {
