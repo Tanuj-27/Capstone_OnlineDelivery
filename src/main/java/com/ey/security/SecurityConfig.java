@@ -21,45 +21,31 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-
 public class SecurityConfig {
 
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
-
     public SecurityConfig(JwtAuthorizationFilter jwtAuthorizationFilter) {
-
         this.jwtAuthorizationFilter = jwtAuthorizationFilter;
-
     }
 
     @Bean
-
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
-
     }
 
     @Bean
-
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 
         return config.getAuthenticationManager();
-
     }
 
     @Bean
-
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-
             .csrf(csrf -> csrf.disable())
-
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
             .authorizeHttpRequests(auth -> auth
-
                 .requestMatchers(
 
                         "/api/auth/register",

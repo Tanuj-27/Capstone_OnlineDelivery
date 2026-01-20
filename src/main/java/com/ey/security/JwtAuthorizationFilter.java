@@ -31,86 +31,83 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+	private final JwtUtil jwtUtil;
 
-    private final UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 
-    public JwtAuthorizationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+	public JwtAuthorizationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
 
-        this.jwtUtil = jwtUtil;
+		this.jwtUtil = jwtUtil;
 
-        this.userDetailsService = userDetailsService;
+		this.userDetailsService = userDetailsService;
 
-    }
+	}
 
-    @Override
+	@Override
+	protected void doFilterInternal(
 
-    protected void doFilterInternal(
+			HttpServletRequest request,
 
-            HttpServletRequest request,
+			HttpServletResponse response,
 
-            HttpServletResponse response,
+			FilterChain filterChain
 
-            FilterChain filterChain
+	) throws ServletException, IOException {
 
-    ) throws ServletException, IOException {
+		String path = request.getRequestURI();
 
-        String path = request.getRequestURI();
+		if (path.startsWith("/api/auth/")) {
 
-        if (path.startsWith("/api/auth/")) {
+			filterChain.doFilter(request, response);
 
-            filterChain.doFilter(request, response);
+			return;
 
-            return;
+		}
 
-        }
+		String header = request.getHeader("Authorization");
 
-        String header = request.getHeader("Authorization");
+		if (header == null || !header.startsWith("Bearer ")) {
 
-        if (header == null || !header.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
 
-            filterChain.doFilter(request, response);
+			return;
 
-            return;
+		}
 
-        }
+		String token = header.substring(7);
 
-        String token = header.substring(7);
+		try {
 
-        try {
+			String email = jwtUtil.extractEmail(token);
 
-            String email = jwtUtil.extractEmail(token);
+			Role role = jwtUtil.extractRole(token);
 
-            Role role = jwtUtil.extractRole(token);
+			UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+			UsernamePasswordAuthenticationToken auth =
 
-            UsernamePasswordAuthenticationToken auth =
+					new UsernamePasswordAuthenticationToken(
 
-                    new UsernamePasswordAuthenticationToken(
+							userDetails,
 
-                            userDetails,
+							null,
 
-                            null,
+							List.of(new SimpleGrantedAuthority("ROLE_" + role.name()))
 
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role.name()))
+					);
 
-                    );
+			SecurityContextHolder.getContext().setAuthentication(auth);
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+		} catch (JwtException | IllegalArgumentException ex) {
 
-        } catch (JwtException | IllegalArgumentException ex) {
+			SecurityContextHolder.clearContext();
 
-            SecurityContextHolder.clearContext();
+		}
 
-        }
+		filterChain.doFilter(request, response);
 
-        filterChain.doFilter(request, response);
-
-    }
+	}
 
 }
- 

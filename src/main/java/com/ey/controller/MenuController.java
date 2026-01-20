@@ -19,29 +19,22 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
 @RestController
-
 @RequestMapping("/api")
-
 public class MenuController {
 
     @Autowired
-
     private MenuService menuService;
 
     @PostMapping("/restaurants/{restaurantId}/menu")
-
     public ResponseEntity<?> addMenuItem(
 
             @PathVariable @Min(value = 1, message = "restaurantId must be valid") Long restaurantId,
 
             @Valid @RequestBody MenuItemCreateRequest request) {
-
         return menuService.addMenuItem(restaurantId, request);
-
     }
 
     @GetMapping("/restaurants/{restaurantId}/menu")
-
     public ResponseEntity<?> getMenuItems(
 
             @PathVariable @Min(value = 1, message = "restaurantId must be valid") Long restaurantId) {
@@ -51,7 +44,6 @@ public class MenuController {
     }
 
     @GetMapping("/restaurants/{restaurantId}/menu/search/{keyword}")
-
     public ResponseEntity<?> searchMenu(
 
             @PathVariable @Min(value = 1, message = "restaurantId must be valid") Long restaurantId,
@@ -63,7 +55,6 @@ public class MenuController {
     }
 
     @GetMapping("/restaurants/{restaurantId}/menu/price-range/{min}/{max}")
-
     public ResponseEntity<?> filterByPriceRange(
 
             @PathVariable @Min(value = 1, message = "restaurantId must be valid") Long restaurantId,
@@ -77,7 +68,6 @@ public class MenuController {
     }
 
     @GetMapping("/restaurants/{restaurantId}/menu/{itemId}")
-
     public ResponseEntity<?> getMenuItemById(
 
             @PathVariable @Min(value = 1, message = "restaurantId must be valid") Long restaurantId,
@@ -89,7 +79,6 @@ public class MenuController {
     }
 
     @PutMapping("/restaurants/{restaurantId}/menu/{itemId}")
-
     public ResponseEntity<?> updateMenuItem(
 
             @PathVariable @Min(value = 1, message = "restaurantId must be valid") Long restaurantId,
@@ -103,7 +92,6 @@ public class MenuController {
     }
 
     @PutMapping("/restaurants/{restaurantId}/menu/{itemId}/price")
-
     public ResponseEntity<?> updateMenuItemPrice(
 
             @PathVariable @Min(value = 1, message = "restaurantId must be valid") Long restaurantId,
@@ -117,7 +105,6 @@ public class MenuController {
     }
 
     @DeleteMapping("/restaurants/{restaurantId}/menu/{itemId}")
-
     public ResponseEntity<?> deleteMenuItem(
 
             @PathVariable @Min(value = 1, message = "restaurantId must be valid") Long restaurantId,
